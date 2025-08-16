@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="logo.svg" type="image/svg+xml" />
+    <title>VisLearn Logo</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        margin-right: 20px;
+      }
+      .controls {
+        display: flex;
+        flex-direction: column;
+      }
+      button {
+        margin-bottom: 10px;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="720" height="720"></canvas>
+    <div class="controls">
+      <button id="toggleBg">Toggle Background</button>
+      <button id="download1x">Download PNG (1x)</button>
+      <button id="download2x">Download PNG (2x)</button>
+      <button id="download5x">Download PNG (5x)</button>
+    </div>
+
+    <script>
+      window.onload = function () {
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        const originalWidth = 720;
+        const originalHeight = 720;
+        let isTransparent = false;
+
+        function loadImage() {
+          img.src = isTransparent ? 'transparent.svg' : 'logo.svg';
+        }
+
+        img.onload = function () {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, originalWidth, originalHeight);
+        };
+
+        loadImage();
+
+        function downloadCanvasAsPng(scale) {
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d');
+          const width = originalWidth * scale;
+          const height = originalHeight * scale;
+
+          tempCanvas.width = width;
+          tempCanvas.height = height;
+
+          // Draw the loaded image onto the temporary canvas at the new scale
+          tempCtx.drawImage(img, 0, 0, width, height);
+
+          const link = document.createElement('a');
+          const fileName = isTransparent ? 'transparent' : 'logo';
+          link.download = `${fileName}-${scale}x.png`;
+          link.href = tempCanvas.toDataURL('image/png');
+          link.click();
+        }
+
+        document
+          .getElementById('toggleBg')
+          .addEventListener('click', function () {
+            isTransparent = !isTransparent;
+            loadImage();
+          });
+
+        document
+          .getElementById('download1x')
+          .addEventListener('click', function () {
+            downloadCanvasAsPng(1);
+          });
+
+        document
+          .getElementById('download2x')
+          .addEventListener('click', function () {
+            downloadCanvasAsPng(2);
+          });
+
+        document
+          .getElementById('download5x')
+          .addEventListener('click', function () {
+            downloadCanvasAsPng(5);
+          });
+      };
+    </script>
+  </body>
+</html>
